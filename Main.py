@@ -7,6 +7,7 @@ import time
 def start(update, context):
     update.message.reply_text(
         "temp message")
+    context.user_data['dir'] = 'files'
     return 1
 
 def help(update, context):
@@ -20,8 +21,14 @@ def stop(update, context):
 def text(update, context):
     if update.message.text == '/stop':
         return ConversationHandler.END
+    elif update.message.text == 'update 228qwertychelik':
+        #make_answer(update=True)
+        update.message.reply_text('Update... done')
+        return 1
     else:
-        update.message.reply_text('Я получил сообщение ' + update.message.text)
+
+        update.message.reply_text('Я получил сообщение ' + update.message.text + ' ' + context.user_data['last'])
+        context.user_data['last'] = update.message.text
         return 1
 
 
