@@ -3,10 +3,12 @@ from telegram.ext import CallbackContext, CommandHandler, ConversationHandler
 from fp.fp import FreeProxy
 from telegram import ReplyKeyboardMarkup
 import os
+import importlib
 
 
 def start(update, context):
     context.user_data['dir'] = 'files'
+    context.user_data['func_work'] = False
     return 1
 
 
@@ -19,8 +21,10 @@ def stop(update, context):
     update.message.reply_text('Stop')
 
 
-def make_answer():
-    pass
+def make_answer(way):
+    module = importlib.import_module(way)
+    func = module.function
+    return func
 
 
 def options(dir, action):
@@ -29,25 +33,27 @@ def options(dir, action):
     else:
         tdir = dir + '/' + action
     if os.path.isfile(tdir):
-        return dir, True, os.listdir(dir)
+        return dir, True, os.listdir(dir), tdir
     else:
-        return tdir, False, os.listdir(tdir)
+        return tdir, False, os.listdir(tdir), ''
 
 
 def text(update, context):
-    if update.message.text == '/stop':
+    if context.user_data['func_work'] == True:
+        answ = context.user_data['func'](update, context)
+        if answ == -1:
+            context.user_data['func_work'] = False
+            context.user_data['func'] = 0
+    elif update.message.text == '/stop':
         return ConversationHandler.END
-    elif update.message.text == 'update 228qwertychelik':
-        # make_answer(update=True)
-        update.message.reply_text('Update... done')
-        return 1
     else:
         text = update.message.text
         print(text)
         try:
-            context.user_data['dir'], need_open, dirs = options(context.user_data['dir'], text)
+            context.user_data['dir'], need_open, dirs, open_dir = options(context.user_data['dir'], text)
             if need_open:
-                pass
+                context.user_data['func'] = make_answer(open_dir)
+                context.user_data['func_work'] = True
             else:
                 print([[i] for i in dirs], [[i] for i in dirs].append(['Back']), context.user_data['dir'])
                 temp = [[i] for i in dirs]
