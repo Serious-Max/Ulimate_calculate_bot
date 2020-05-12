@@ -21,7 +21,7 @@ def help(update, context):
         "Select the desired function. Click on it. "
         "The function is executed once. "
         "After that use the keyboard. /stop to stop, /help to help(this messange)"
-        "/start to restart (if you have problems)")
+        "/start to restart (if you have problems). Use 'exit' to stop function")
 
 
 def stop(update, context):
@@ -57,7 +57,10 @@ def text(update, context, skip=False):
         help(update, context)
         return 1
     elif context.user_data['func_work'] == True:
-        answ = context.user_data['func'](update, context)
+        if update.message.text == 'exit':
+            answ = -1
+        else:
+            answ = context.user_data['func'](update, context)
         if answ == -1:
             context.user_data['func_work'] = False
             context.user_data['func'] = 0
