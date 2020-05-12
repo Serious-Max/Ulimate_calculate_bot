@@ -4,7 +4,7 @@ def function(update, context):
     except:
         state = 1
     if state == 1:
-        update.message.reply_text('Enter 2 nums with + / - / * / /: a_b')
+        update.message.reply_text('Введите 2 числа, с которыми нужно произвести операцию, разделяя знаком действия')
         context.user_data['state'] = 2
         return 0
     elif state == 2:
@@ -30,5 +30,5 @@ def function(update, context):
                 update.message.reply_text(str(a / b))
             return -1
         except:
-            update.message.reply_text('error. try again')
+            update.message.reply_text('Ошибка, попробуйте снова')
             return 0

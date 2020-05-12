@@ -7,13 +7,13 @@ def function(update, context):
     except:
         state = 1
     if state == 1:
-        update.message.reply_text('Enter round(n), where n - number')
+        update.message.reply_text('Введите число k, которое нужно округлить, целую часть нужно отделить от дробной точкой')
         context.user_data['state'] = 2
         return 0
     elif state == 2:
         try:
             text = update.message.text
-            k = int(text.split('(')[1][:-1])
+            k = int(text)
             fl = k - int(k)
             if fl >= 0.5:
                 update.message.reply_text(int(k) + 1)
@@ -21,5 +21,5 @@ def function(update, context):
                 update.message.reply_text(int(k))
             return -1
         except:
-            update.message.reply_text('error. try again')
+            update.message.reply_text('Ошибка, попробуйте снова')
             return 0
