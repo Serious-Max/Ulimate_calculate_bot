@@ -9,7 +9,7 @@ def function(update, context):
         return 0
     elif state == 2:
         try:
-            text = update.message.text()
+            text = update.message.text
             n = int(text.split('(')[1][:-1])
             f = False
             for i in range(2, int(n ** .5) + 1):

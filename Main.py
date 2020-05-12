@@ -37,7 +37,6 @@ def make_answer(way):
 
 
 def options(dir, action):
-    print(dir, action)
     if action == 'Back':
         if dir != 'files':
             tdir = '/'.join(dir.split('/')[:-1])
@@ -63,12 +62,10 @@ def text(update, context, skip=False):
             context.user_data['func_work'] = False
             context.user_data['func'] = 0
             context.user_data['state'] = 1
-            print('skip 1')
             text(update, context, skip=True)
         else:
             return 1
     if skip == True:
-        print('skip 2')
         dirs = os.listdir(context.user_data['dirs'])
         temp = [[i] for i in dirs]
         update.message.reply_text('Select dir',
@@ -78,9 +75,7 @@ def text(update, context, skip=False):
         text_t = update.message.text
         try:
             context.user_data['dir'], need_open, dirs, open_dir = options(context.user_data['dir'], text_t)
-            print(1)
             if need_open:
-                print(2)
                 context.user_data['func'] = make_answer(open_dir)
                 context.user_data['func_work'] = True
                 context.user_data['state'] = 1
@@ -101,13 +96,12 @@ def main():
     while 1:
         try:
             print('start find proxy...')
-
-            #request_kwargs = {
-            #    'proxy_url': FreeProxy().get()
-            #}
-            #print('set proxy', request_kwargs['proxy_url'])
-            updater = Updater(token='', use_context=True)#,
-                              #request_kwargs=request_kwargs)  # нужен токен бота
+            request_kwargs = {
+                'proxy_url': FreeProxy().get()
+            }
+            print('set proxy', request_kwargs['proxy_url'])
+            updater = Updater(token='1279678359:AAHt3EhVe3daGWBgyyChxyMgtH1-FgWyQWI', use_context=True,
+                              request_kwargs=request_kwargs)  # нужен токен бота
             dp = updater.dispatcher
             main_handler = ConversationHandler(
                 entry_points=[CommandHandler('start', start)],
