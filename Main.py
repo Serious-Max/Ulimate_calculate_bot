@@ -9,6 +9,10 @@ import importlib
 def start(update, context):
     context.user_data['dir'] = 'files'
     context.user_data['func_work'] = False
+    dirs = os.listdir('files')
+    temp = [[i] for i in dirs]
+    update.message.reply_text('Select dir',
+                              reply_markup=ReplyKeyboardMarkup(temp, one_time_keyboard=True))
     return 1
 
 
@@ -22,14 +26,17 @@ def stop(update, context):
 
 
 def make_answer(way):
-    module = importlib.import_module(way)
+    with open(way, mode='rt') as file:
+        temp = file.read()
+    module = importlib.import_module(temp)
     func = module.function
     return func
 
 
 def options(dir, action):
     if action == 'Back':
-        tdir = '/'.join(dir.split('/')[:-1])
+        if dir != 'files':
+            tdir = '/'.join(dir.split('/')[:-1])
     else:
         tdir = dir + '/' + action
     if os.path.isfile(tdir):
@@ -38,31 +45,42 @@ def options(dir, action):
         return tdir, False, os.listdir(tdir), ''
 
 
-def text(update, context):
-    if context.user_data['func_work'] == True:
+def text(update, context, skip=False):
+    if update.message.text == '/stop':
+        return ConversationHandler.END
+    elif context.user_data['func_work'] == True:
         answ = context.user_data['func'](update, context)
         if answ == -1:
             context.user_data['func_work'] = False
             context.user_data['func'] = 0
-    elif update.message.text == '/stop':
-        return ConversationHandler.END
+            context.user_data['state'] = 1
+            print('skip 1')
+        else:
+            return 1
+    if skip == True:
+        print('skip 2')
+        dirs = os.listdir(context.user_data['dirs'])
+        temp = [[i] for i in dirs]
+        update.message.reply_text('Select dir',
+                                  reply_markup=ReplyKeyboardMarkup(temp, one_time_keyboard=True))
+        return 1
     else:
         text = update.message.text
-        print(text)
         try:
             context.user_data['dir'], need_open, dirs, open_dir = options(context.user_data['dir'], text)
             if need_open:
                 context.user_data['func'] = make_answer(open_dir)
                 context.user_data['func_work'] = True
+                context.user_data['state'] = 1
+                text(update, context)
             else:
-                print([[i] for i in dirs], [[i] for i in dirs].append(['Back']), context.user_data['dir'])
                 temp = [[i] for i in dirs]
                 temp.append(['Back'])
                 update.message.reply_text('Select dir',
-                                          reply_markup=ReplyKeyboardMarkup(temp, one_time_keyboard=False))
+                                          reply_markup=ReplyKeyboardMarkup(temp, one_time_keyboard=True))
 
         except Exception as ex:
-            print(ex, ex.with_traceback())
+            print(ex, type(ex))
             update.message.reply_text('Error. Please, try again')
         return 1
 
@@ -73,10 +91,10 @@ def main():
             print('start find proxy...')
 
             request_kwargs = {
-                'proxy_url': FreeProxy(country_id=['US', 'UK']).get()
+                'proxy_url': FreeProxy().get()
             }
             print('set proxy', request_kwargs['proxy_url'])
-            updater = Updater(token='1279678359:AAHt3EhVe3daGWBgyyChxyMgtH1-FgWyQWI', use_context=True,
+            updater = Updater(token='', use_context=True,
                               request_kwargs=request_kwargs)  # нужен токен бота
             dp = updater.dispatcher
             main_handler = ConversationHandler(

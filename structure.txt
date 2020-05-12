@@ -1,3 +1,0 @@
-files/math/A
-files/math/C
-files/economy/B
